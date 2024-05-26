@@ -7,8 +7,6 @@ import CookieHandling from "../../Misc/CookieHandling";
 import {useNavigate} from "react-router";
 import BaseForm from "../BaseForm";
 import RememberMeCheckbox from "./LoginFormComponents/RememberMeCheckbox";
-import Tokens from "../../Users/Tokens";
-import PendingUser from "../../Users/PendingUser";
 
 /**
  * The log-in form of the app.
@@ -20,53 +18,40 @@ function LoginForm({props}) {
     const nav = useNavigate();
 
     // Verifies the user's identity on submit or other events.
-    const handleVerification = async (e, username, password) => {
+    const handleVerification = (e, username, password) => {
         e.preventDefault();
         let isUsername = $("#username-radio").is(":checked");
         if (username === "" && password === "") {
             return
         }
         // If user verified successfully, this will be executed.
-        const onSuccess = (rememberMe) => {
+        const onSuccess = () => {
             wrongDetails.hide();
             props.setLogIn(true);
-            if (rememberMe) {
+            if ($("#remember-me-checkbox").is(":checked")) {
                 // Renews cookie for the logged-in user.
-                CookieHandling.deleteCookie("rToken");
-                CookieHandling.setCookie("rToken", Tokens.refreshToken, 30);
+                CookieHandling.deleteCookie("username");
+                CookieHandling.deleteCookie("password");
+                CookieHandling.setCookie("username", username, 7);
+                CookieHandling.setCookie("password", password, 7);
             }
-            Tokens.autoRenewTokens(rememberMe);
             nav("/chat");
         }
         let wrongDetails = $("#wrong-details-text");
         if (isUsername) {
-            if (await RegisteredUser.DoUserAndPasswordMatch(username, password)) {
-                onSuccess($("#remember-me-checkbox").is(":checked"));
+            if (RegisteredUser.DoUserAndPasswordMatch(username, password)) {
+                onSuccess();
             } else {
-                if (await PendingUser.checkPendingUserMatch(username, password)){
-                    await PendingUser.renewCode(username);
-                    props.fromSetter(true);
-                    nav("/verify_email");
-                }
-                else {
-                    wrongDetails.text("Incorrect username or password");
-                    wrongDetails.show();
-                }
+                wrongDetails.text("Incorrect username or password");
+                wrongDetails.show();
             }
         } else {
             // Emails are not case-sensitive, hence the toLowerCase.
-            if (await RegisteredUser.doEmailAndPasswordMatch(username.toLowerCase(), password)) {
+            if (RegisteredUser.doEmailAndPasswordMatch(username.toLowerCase(), password)) {
                 onSuccess();
             } else {
-                if (await PendingUser.checkPendingUserMatchByEmail(username, password)){
-                    await PendingUser.renewCodeByeEmail(username);
-                    props.fromSetter(true);
-                    nav("/verify_email");
-                }
-                else {
-                    wrongDetails.text("Incorrect Email or password");
-                    wrongDetails.show();
-                }
+                wrongDetails.text("Incorrect Email or password");
+                wrongDetails.show();
             }
         }
     }

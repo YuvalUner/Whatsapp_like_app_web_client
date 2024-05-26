@@ -11,11 +11,8 @@ class ContactContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            lastMessageDate: Date.parse(props.lastSeen),
-            description: null,
-            valid: false
+            lastMessageDate: RegisteredUser.getLastSeen(this.props.user, this.props.username)
         };
-        this.props.connection.on("updateTime", () => this.updateTime());
     }
 
     /**
@@ -23,30 +20,15 @@ class ContactContainer extends Component {
      */
     updateTime = () => {
         this.setState(
-            {lastMessageDate: Date.parse(this.props.lastSeen)}
+            {lastMessageDate: RegisteredUser.getLastSeen(this.props.user, this.props.username)}
         );
     }
 
     /**
      * Make updates occur every minute.
      */
-    async componentDidMount() {
+    componentDidMount() {
         setInterval(this.updateTime, 60000);
-        this.setState({
-            nickname: await RegisteredUser.getNickname(this.props.username),
-            description: await RegisteredUser.getDescription(this.props.username),
-            valid: true
-        });
-        this.props.connection.on("nicknameChanged", async () => {
-            this.setState({
-                nickname: await  RegisteredUser.getNickname(this.props.username)
-            });
-        });
-        this.props.connection.on("descriptionChanged", async () => {
-            this.setState({
-                description: await RegisteredUser.getDescription(this.props.username)
-            });
-        })
     }
 
     /**
@@ -65,7 +47,7 @@ class ContactContainer extends Component {
         else if (timeDelta < 1440) {
             return Math.floor(timeDelta / 60) + " hours ago";
         } else {
-            let date = new Date(this.state.lastMessageDate);
+            let date = this.state.lastMessageDate;
             let day = date.getDate().toString().padStart(2, "0");
             let month = date.getMonth() + 1;
             let year = date.getFullYear();
@@ -76,11 +58,10 @@ class ContactContainer extends Component {
     /**
      * Adds a clear indication to the user that they chose the contact, and changes to that contact.
      */
-    focusHandler = async (e) => {
-        e.persist();
+    focusHandler = () => {
         let thisItem = $("#contact" + this.props.username);
         thisItem.addClass("active border-primary border-primary border-2");
-        await this.props.setConvo(this.props.username);
+        this.props.setConvo(this.props.username);
     }
 
     blurHandler = () => {
@@ -92,22 +73,21 @@ class ContactContainer extends Component {
     render() {
         return (
             <li className="d-grid list-group-item bg-light hover-pointer mw-50" id={"contact" + this.props.username}>
-                <button onFocus={async (e)=> await this.focusHandler(e)} onBlur={this.blurHandler}
+                <button onFocus={this.focusHandler} onBlur={this.blurHandler}
                         className="btn no-effect-button text-start btn-flex justify-content-left break-text">
                     <div className="col">
                         <div className="break-text">
-                            {this.state.valid && <ImageNameContainer
-                                username={this.props.username}
-                                nickname={this.state.nickname}
-                                renderNum={false} profilePicture={RegisteredUser.getImage(this.props.username)}/>}
+                            <ImageNameContainer props={{
+                                username: this.props.username,
+                                nickname: RegisteredUser.getNickname(this.props.username),
+                                renderNum: false, profilePicture: RegisteredUser.getImage(this.props.username)
+                            }}/>
                             <span className="float-end small-text">
                                 {this.timeFromLast()}
                             </span>
-                            {this.state.valid &&
-                                <div className="small-text break-text">
-                                    {this.state.description}
-                                </div>
-                            }
+                            <div className="small-text break-text">
+                                {RegisteredUser.getDescription(this.props.username)}
+                            </div>
                         </div>
                     </div>
                 </button>

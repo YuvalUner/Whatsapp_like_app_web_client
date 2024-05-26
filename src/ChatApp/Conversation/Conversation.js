@@ -18,15 +18,11 @@ class Conversation extends Component {
             <>
                 {this.props.convo &&
                     <div className="col-8" id="conversation">
-                        <UserProfileContainer nickname={this.props.nickname}
-                                              username={this.props.convo}
-                                              renderButtons={false}
-                                              renderNum={false}/>
+                        <UserProfileContainer nickname={this.props.nickname} username={this.props.convo}
+                                              renderButtons={false} renderNum={false}/>
                         <ConversationContainer convo={this.props.convoContent}/>
-                        <InputBar username={this.props.username}
-                                  convo={this.props.convo}
-                                  setConvo={this.props.setConvo}
-                                  connection={this.props.connection}/>
+                        <InputBar username={this.props.username} convo={this.props.convo}
+                                  setConvo={this.props.setConvo}/>
                     </div>
                 }
             </>

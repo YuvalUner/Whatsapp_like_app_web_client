@@ -20,6 +20,7 @@ import React, {useState} from "react";
  */
 function Router({props}) {
 
+    const [username, setUsername] = useState(props.username);
     const [toggle, setToggle] = useState(true);
     const [from, setFrom] = useState(false);
 
@@ -29,30 +30,30 @@ function Router({props}) {
             return (
                 <>
                     <Route path="/log_in" element={<LoginForm props={{
-                        username: props.setUsername, toggle: setToggle,
+                        username: setUsername, toggle: setToggle,
                         fromSetter: setFrom, passReset: from, setLogIn: props.setLoggedIn
                     }}/>}/>
-                    <Route path="/sign_up" element={<SignUpForm props={{setUser: props.setUsername, from: setFrom}}/>}/>
+                    <Route path="/sign_up" element={<SignUpForm props={{username: setUsername, from: setFrom}}/>}/>
                     <Route path="/forgot_password" element={<InitialForgotPasswordForm
                         props={{
-                            username: props.username,
-                            usernameSetter: props.setUsername,
+                            username: username,
+                            usernameSetter: setUsername,
                             toggle: toggle,
                             toggleSetter: setToggle,
                         }}/>}/>
                     <Route path="*" element={<LoginForm props={{
-                        username: props.setUsername, toggle: setToggle,
+                        username: setUsername, toggle: setToggle,
                         fromSetter: setFrom, passReset: from, setLogIn: props.setLoggedIn
                     }}/>}/>
                     <Route path="/verify_email" element={
                         <EmailVerificationForm props={{
-                            username: props.username, fromSignup: from,
+                            username: username, fromSignup: from,
                             setFrom: setFrom, setLogIn: props.setLoggedIn
                         }}/>}/>
                     <Route path="/forgot_password/verify" element={
-                        <ForgotPasswordFormVerificationScreen props={{username: props.username}}/>}/>
+                        <ForgotPasswordFormVerificationScreen props={{username: username}}/>}/>
                     <Route path="/forgot_password/reset_password" element={
-                        <ForgotPasswordFormResetPassword props={{username: props.username, setter: setFrom}}/>}/>
+                        <ForgotPasswordFormResetPassword props={{username: username, setter: setFrom}}/>}/>
                 </>
             )
         }
@@ -60,7 +61,7 @@ function Router({props}) {
         else {
             return (
                 <>
-                    <Route path="*" element={<MainApp setLogIn={props.setLoggedIn} username={props.username}/>}/>
+                    <Route path="*" element={<MainApp setLogIn={props.setLoggedIn} username={username}/>}/>
                 </>
             )
         }

@@ -30,13 +30,13 @@ function SignUpForm({props}) {
     const [nicknameConfirm, nicknameConfirmSet] = useState(false);
     const [secretQuestionConfirm, secretQuestionConfirmSet] = useState(false);
     const [secretAnswerConfirm, secretAnswerConfirmSet] = useState(false);
-    const [phoneConfirm, phoneConfirmSet] = useState(true);
+    const [phoneConfirm, phoneConfirmSet] = useState(false);
 
 
     const nav = useNavigate();
 
     //This function prevents then loss of info in refresh once we submit new user
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
         let isTos = $("#tos-radio-check").is(":checked");
         let isPrivacyPolicy = $("#privacy-policy-radio-check").is(":checked");
@@ -44,29 +44,23 @@ function SignUpForm({props}) {
         //Checks that user agreed to terms of service and privacy policy, and all inputs are correct
         if (isTos && isPrivacyPolicy) {
             if (userConfirm && passConfirm && passConfirmationConfirm
-                && emailConfirm && nicknameConfirm && secretQuestionConfirm && secretAnswerConfirm
-                && phoneConfirm) {
+                && emailConfirm && nicknameConfirm && secretQuestionConfirm && secretAnswerConfirm) {
                 let username = $("#username-signup-field").val();
                 let email = $("#email-signup-field").val().toLowerCase();
                 let password = $("#new-pass1").val();
                 let nickname = $("#nickname-signup-field").val();
-                let phone = $("#phone-signup-field").val();
+                let phone = $("#phone").val();
                 let secretQuestion = $("#secret-questions").val();
                 let secretAnswer = $("#secret-answer").val();
+                props.username(username);
+                props.from(true);
                 //if all inputs are correct, create user
-                let pendingUser = new PendingUser({
+                new PendingUser({
                     username: username, password: password,
-                    email: email, phone: phone, nickname: nickname,
-                    secretQuestion: {question: secretQuestion, answer: secretAnswer}
+                    email: email, phone: phone, dateOfBirth: null, nickname: nickname,
+                    secretQuestions: {question: secretQuestion, answer: secretAnswer}
                 });
-                if (await PendingUser.signUp(pendingUser)) {
-                    props.setUser(username);
-                    props.from(true);
-                    nav("/verify_email");
-                }
-                else{
-                    $("#something-went-wrong").show();
-                }
+                nav("/verify_email");
             }
             //If user didn't agree to terms of service or privacy policy, mark them as red.
         } else {
@@ -101,9 +95,6 @@ function SignUpForm({props}) {
                     <PrivacyPolicyField/>
                     <div className="d-grid gap-2 col-6 mx-auto mb-3">
                         <button className="btn btn-primary">Submit</button>
-                    </div>
-                    <div className="mt-2 error-text" id="something-went-wrong">
-                        Oops, something went wrong. Please verify your details and try again.
                     </div>
                 </div>
                 <div>

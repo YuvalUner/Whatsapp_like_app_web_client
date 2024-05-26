@@ -14,10 +14,10 @@ const InputBar =  (props) => {
     const [modalShow, setModalShow] = useState(false);
 
     //function sends the text message typed into the input bar, and adds it to the conversation.
-    const handleSend = async (e) => {
+    const handleSend = (e) => {
         e.preventDefault();
         let inputField = $("#message-input");
-        await RegisteredUser.addMessageToConvo(props.username, props.convo, {
+        RegisteredUser.addMessageToConvo(props.username, props.convo, {
             sender: true, type: "text", time: new Date(), content: inputField.val()
         })
         inputField.val("");

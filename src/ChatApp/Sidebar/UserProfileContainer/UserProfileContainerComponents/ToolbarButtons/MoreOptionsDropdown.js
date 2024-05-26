@@ -37,11 +37,9 @@ function MoreOptionsDropdown({props}) {
                     <DropdownItem as="form"><ChangePictureButton
                         username={props.username} updateProfilePicture={props.updateProfilePicture}/></DropdownItem>
                     <DropdownItem as="div"><ChangeTextDataButton textData={"description"}
-                                                                 username={props.username}
-                                                                 connection={props.connection}/></DropdownItem>
+                                                                 username={props.username}/></DropdownItem>
                     <DropdownItem as="div"><ChangeTextDataButton textData={"nickname"} username={props.username}
-                                                                 updateNickname={props.updateNickname}
-                                                                 connection={props.connection}/></DropdownItem>
+                                                                 updateNickname={props.updateNickname}/></DropdownItem>
                 </DropdownMenu>
             </Dropdown>
         </>

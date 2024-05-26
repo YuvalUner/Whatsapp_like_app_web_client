@@ -6,18 +6,41 @@ import React, {useState} from "react";
 import Router from "./Misc/Router";
 import CookieHandling from "./Misc/CookieHandling";
 import registeredUser from "./Users/RegisteredUser";
-import Tokens from "./Users/Tokens";
 
 function App() {
 
-    const [userLoggedIn, setUserLoggedIn] = useState(false);
-    const [username, setUsername] = useState("");
+    // Incredibly temporary methods where we make awful storage of sessions storage as our database.
+    // This causes all sorts of issues when trying to send messages to or from them.
+    // but as this should all go away the moment we set up a server, we have decided to not try and debug this.
+    PendingUser.pendingUsers.forEach(element => {
+        sessionStorage.setItem(element.username + "pend", JSON.stringify(element));
+        sessionStorage.setItem(element.email + "pend", JSON.stringify(element));
+    });
+    RegisteredUser.registeredUsers.forEach(element => {
+        sessionStorage.setItem(element.username + "log", JSON.stringify(element));
+        sessionStorage.setItem(element.email + "log", JSON.stringify(element));
+    });
+
+    let cookie_verified = false;
+    const cUsername = CookieHandling.getCookie("username");
+    const password = CookieHandling.getCookie("password");
+    // Log the user in automatically if cookie can be verified.
+    if (cUsername && password){
+        if (registeredUser.DoUserAndPasswordMatch(cUsername, password)
+            || registeredUser.doEmailAndPasswordMatch(cUsername, password)){
+            cookie_verified = true;
+            // Extend cookie TTL back to a week.
+            CookieHandling.setCookie("username", cUsername, 7);
+            CookieHandling.setCookie("password", password, 7);
+        }
+    }
+
+    const [userLoggedIn, setUserLoggedIn] = useState(cookie_verified);
 
     return (
-        <SharedDesign setUser={setUsername} setLoggedIn={setUserLoggedIn}>
+        <SharedDesign>
             <BrowserRouter>
-                <Router props={{loggedIn: userLoggedIn, setLoggedIn: setUserLoggedIn,
-                    username: username, setUsername: setUsername}}/>
+                <Router props={{loggedIn: userLoggedIn, setLoggedIn: setUserLoggedIn, username: "Panda"}}/>
             </BrowserRouter>
         </SharedDesign>
     );

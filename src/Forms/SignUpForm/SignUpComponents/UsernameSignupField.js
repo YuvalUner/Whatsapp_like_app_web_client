@@ -10,7 +10,7 @@ import PendingUser from "../../../Users/PendingUser";
 function UsernameSignupField({props}){
 
     //function checks validity of username and makes sure it doesn't already exist.
-    const handleBlur = async ()=>{
+    const handleBlur = ()=>{
         let usernameField = $("#username-signup-field");
         let text = $("#username-error");
 
@@ -24,7 +24,7 @@ function UsernameSignupField({props}){
         }
 
         //else if condition checks user doesn't already exist, if already exists, pritns error message.
-        else if (await PendingUser.doesUserExistByUsername(usernameField.val())){
+        else if (RegisteredUser.DoesUserExist(usernameField.val()) || PendingUser.doesUserExist(usernameField.val())){
             usernameField.removeClass("border-success");
             usernameField.addClass("border-danger");
             text.text("Error: Username already exists")
@@ -47,7 +47,7 @@ function UsernameSignupField({props}){
                 <span className = "required-field"> *</span>
             </label>
             <div className="col-8">
-                <input type="text" onBlur={async () => await handleBlur()} id="username-signup-field" className="form-control" placeholder="Example: John Smith" required />
+                <input type="text" onBlur={handleBlur} id="username-signup-field" className="form-control" placeholder="Example: John Smith" required />
                 <div className="error-text" id="username-error"/>
             </div>
         </div>

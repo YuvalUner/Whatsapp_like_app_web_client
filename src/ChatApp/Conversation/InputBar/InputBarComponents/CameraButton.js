@@ -8,9 +8,9 @@ import RegisteredUser from "../../../../Users/RegisteredUser";
 function CameraButton({props}) {
 
     //function receives the picture and adds it as message to the conversation.
-    const handleChange = async (e)=>{
+    const handleChange = (e)=>{
         let url = URL.createObjectURL(e.target.files[0]);
-        await RegisteredUser.addMessageToConvo(props.username, props.convo, {
+        RegisteredUser.addMessageToConvo(props.username, props.convo, {
             sender: true, type: "img", time: new Date(), content: url
         });
         props.setConvo();

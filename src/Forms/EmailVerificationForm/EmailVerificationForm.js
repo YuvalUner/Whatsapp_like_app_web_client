@@ -6,7 +6,6 @@ import VerificationFormText from "./EmailVerificationComponents/VerificationForm
 import RegisteredUser from "../../Users/RegisteredUser";
 import {useNavigate} from "react-router";
 import BaseForm from "../BaseForm";
-import Tokens from "../../Users/Tokens";
 
 /**
  * Email verification form for when the user is sent a code to their email.
@@ -19,7 +18,7 @@ function EmailVerificationForm({props}) {
 
     const nav = useNavigate();
 
-    let handleSubmit = async (e) => {
+    let handleSubmit = (e) => {
         e.preventDefault();
         let code = textFormRef.current.value;
         let field = $("#verification-code-input");
@@ -36,18 +35,17 @@ function EmailVerificationForm({props}) {
         }
         // If fromSignup, log the user in.
         if (props.fromSignup) {
-            if (await PendingUser.canVerify(props.username, code)) {
-                await PendingUser.addUser(props.username);
+            if (PendingUser.canVerify(props.username, code)) {
+                PendingUser.addUser(props.username);
                 props.setFrom(false);
                 props.setLogIn(true);
-                Tokens.autoRenewTokens(false);
                 nav("/")
             } else {
                 onError();
             }
             // Otherwise, continue to reset password form.
         } else {
-            if (await RegisteredUser.canVerify(props.username, code)) {
+            if (RegisteredUser.canVerify(props.username, code)) {
                 nav("/forgot_password/reset_password");
             } else {
                 onError();
@@ -59,7 +57,7 @@ function EmailVerificationForm({props}) {
         <BaseForm>
             <form id="verify-form" onSubmit={handleSubmit}>
                 <VerificationFormText props={{fromSignup: props.fromSignup}}/>
-                <VerifierField props={{textRef: textFormRef, username: props.username, fromSignup: props.fromSignup}}/>
+                <VerifierField props={{textRef: textFormRef, username: props.username}}/>
                 <div className="col text-center mt-4">
                     <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Submit</button>
                 </div>

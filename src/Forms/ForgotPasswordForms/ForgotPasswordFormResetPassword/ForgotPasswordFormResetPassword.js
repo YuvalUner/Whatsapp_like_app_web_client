@@ -19,18 +19,18 @@ function ForgotPasswordFormResetPassword({props}) {
     const [passwordConfirmationConfirm, passwordConfirmationConfirmSet] = useState(false);
     const nav = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (passwordConfirm && passwordConfirmationConfirm) {
             props.setter(true);
-            await RegisteredUser.updatePassword(props.username, $("#new-pass1").val());
+            RegisteredUser.updatePassword(props.username, $("#new-pass1").val());
             nav("/");
         }
     }
 
     return (
         <BaseForm>
-            <form onSubmit={async (e) => handleSubmit(e)}>
+            <form onSubmit={handleSubmit}>
                 <ForgotPasswordFormResetPasswordText/>
                 <PasswordSignupField props={{
                     setConfirmPass: passwordConfirmSet,

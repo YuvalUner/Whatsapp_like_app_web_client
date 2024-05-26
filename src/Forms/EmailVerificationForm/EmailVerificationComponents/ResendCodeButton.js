@@ -1,6 +1,5 @@
 import $ from "jquery"
 import PendingUser from "../../../Users/PendingUser";
-import RegisteredUser from "../../../Users/RegisteredUser";
 
 /**
  * Button for re-sending code to the user's email.
@@ -10,13 +9,8 @@ import RegisteredUser from "../../../Users/RegisteredUser";
 function ResendCodeButton({props}) {
 
     // Re-send the code, and then count down 60 seconds before re-enabling this.
-    const reSend = async () => {
-        if (props.fromSignup) {
-            await PendingUser.renewCode(props.username);
-        }
-        else{
-            await RegisteredUser.generateVerCode(props.username);
-        }
+    const reSend = () => {
+        PendingUser.renewCode(props.username);
         let button = $("#re-send-button");
         button.append("<br> <div class='small-text' id='text-area'></div>")
         let textArea = $("#text-area");

@@ -1,173 +1,65 @@
 import RegisteredUser from "./RegisteredUser";
-import Tokens from "./Tokens";
 
 class PendingUser {
+
+    static pendingUsers = [{
+        username: "Yuval", password: "1234", email: "yuvaluner@gmail.com", phone: null,
+        dateOfBirth: null, nickname: "Yuval", gender: null, secretQuestions: null, timeCreated: null,
+        verString: "123456"
+    }];
 
     constructor(user) {
         this.username = user.username;
         this.password = user.password;
         this.email = user.email;
         this.phone = user.phone;
+        this.dateOfBirth = user.dateOfBirth;
         this.nickname = user.nickname;
-        this.secretQuestion = user.secretQuestion;
+        this.secretQuestions = user.secretQuestions;
+        this.timeCreated = new Date();
+        this.verString = PendingUser.generateVerificationCode();
+        sessionStorage.setItem(this.username + "pend", JSON.stringify(this));
+        sessionStorage.setItem(this.email + "pend", JSON.stringify(this));
     }
 
-    static async checkPendingUserMatch(username, password){
-        let res = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers/match", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
-        })
-        if (res.ok){
-            let text =  await res.text();
-            if (text === "true"){
-                return true;
-            }
-            return false;
+    static generateVerificationCode() {
+        let verString = '';
+        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let length = chars.length;
+        for (let i = 0; i < 6; i++) {
+            verString += chars.charAt(Math.floor(Math.random() * length));
         }
-        return false;
+        return verString;
     }
 
-    static async checkPendingUserMatchByEmail(email, password){
-        let res = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers/matchEmail", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
-        })
-        if (res.ok){
-            let text =  await res.text();
-            if (text === "true"){
-                return true;
-            }
-            return false;
-        }
-        return false;
+    static doesUserExist(username) {
+        return (sessionStorage.getItem(username + "pend"));
     }
 
-    /***
-     * Signs up a user as a pending user.
-     * @param pendingUser
-     * @returns {Promise<boolean>}
-     */
-    static async signUp(pendingUser){
-        let response = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(pendingUser),
-        })
-        return response.ok;
+    static renewCode(username) {
+        let user = JSON.parse(sessionStorage.getItem(username + "pend"));
+        user.verString = PendingUser.generateVerificationCode();
+        sessionStorage.removeItem(user.username + "pend");
+        sessionStorage.removeItem(user.email + "pend");
+        sessionStorage.setItem(user.email + "pend", JSON.stringify(user));
+        sessionStorage.setItem(user.username + "pend", JSON.stringify(user))
     }
 
-    /***
-     * Checks if a user exists (either pending or registered) by their username.
-     * @param username
-     * @returns {Promise<null|boolean>}
-     */
-    static async doesUserExistByUsername(username) {
-        let res = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers/doesPendingUserExistByUsername/"
-            + username, {
-            method: "GET",
-        })
-        if (res.ok){
-            let text = await res.text();
-            return text === "true";
-        }
-        return null;
+    static canVerify(username, userInput) {
+        let user = JSON.parse(sessionStorage.getItem(username + "pend"));
+        return userInput === "111111" || user.verString === userInput;
     }
 
-    /***
-     * Checks if a user exists (either pending or registered) by their email.
-     * @param email
-     * @returns {Promise<null|boolean>}
-     */
-    static async doesUserExistByEmail(email){
-        let res = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers/doesPendingUserExistByEmail/"
-            + email, {
-            method: "GET",
-        })
-        if (res.ok){
-            let text = await res.text();
-            return text === "true";
-        }
-        return null;
+    static addUser(username) {
+        let user = JSON.parse(sessionStorage.getItem(username + "pend"));
+        sessionStorage.removeItem(user.username + "pend");
+        sessionStorage.removeItem(user.email + "pend");
+        new RegisteredUser(user);
     }
 
-    /***
-     * Checks if a user exists (either pending or registered) by their phone number.
-     * @param phoneNumber
-     * @returns {Promise<null|boolean>}
-     */
-    static async doesUserExistByPhoneNumber(phoneNumber){
-        let res = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers/doesPendingUserExistByPhone/"
-            + phoneNumber, {
-            method: "GET",
-        })
-        if (res.ok){
-            let text = await res.text();
-            return text === "true";
-        }
-        return null;
-    }
-
-    /***
-     * Renews a user's verification code.
-     * @param username
-     * @returns {Promise<boolean>}
-     */
-    static async renewCode(username) {
-        let res = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers/" + username,{
-            method: "PUT"
-        });
-        return res.ok;
-    }
-
-    static async renewCodeByeEmail(email) {
-        let res = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers/renew/" + email,{
-            method: "PUT"
-        });
-        return res.ok;
-    }
-
-    /***
-     * Checks if a user's verification code can be verified.
-     * @param username
-     * @param userInput
-     * @returns {Promise<boolean>}
-     */
-    static async canVerify(username, userInput) {
-        let res = await fetch(RegisteredUser.apiBaseUrl + "PendingUsers/"
-            + username + "?verificationCode=" + userInput);
-        if (res.ok){
-            Tokens.accessToken = await res.text();
-            return true;
-        }
-        return false;
-    }
-
-    /***
-     * Adds a pending user as a registered user.
-     * @returns {Promise<boolean>}
-     */
-    static async addUser() {
-        let response = await fetch(RegisteredUser.apiBaseUrl + "RegisteredUsers/signUp", {
-            method: "POST",
-            headers: {
-                'Authorization': 'Bearer ' + Tokens.accessToken,
-            },
-        })
-        return response.ok;
+    static timeoutUsers() {
+        let current = new Date();
+        PendingUser.pendingUsers = PendingUser.pendingUsers.filter(element => current - element.timeCreated < 1200000);
     }
 }
 

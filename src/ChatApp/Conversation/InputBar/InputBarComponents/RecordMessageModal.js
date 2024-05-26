@@ -41,12 +41,12 @@ function RecordMessageModal(props) {
                                 });
 
                                 //Convert the audio data chunks to a single audio data blob
-                                mediaRecorder.addEventListener("stop", async () => {
+                                mediaRecorder.addEventListener("stop", () => {
                                     const audioBlob = new Blob(audioChunks);
 
                                     //Create a URL for that single audio data blob
                                     const audioUrl = URL.createObjectURL(audioBlob);
-                                    await RegisteredUser.addMessageToConvo(props.username, props.convo, {
+                                    RegisteredUser.addMessageToConvo(props.username, props.convo, {
                                         sender: true, type: "audio", time: new Date(), content: audioUrl
                                     });
                                     mediaRecorder = null;
