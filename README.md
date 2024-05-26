@@ -1,7 +1,9 @@
 # `Brief`:
 A web client, written using the React.JS framework, for our Whatsapp-like messaging application, developed as the project for the Advanced Programming 2 course, Bar-Ilan University, 2022.\
 Contains both a version that works with a server and a serverless branch, meant to work locally.\
-Due to accidentally adding a file with sensitive information to the original repository, the project was re-uploaded to this repository without the file.
+Due to accidentally adding a file with sensitive information to the original repository, the project was re-uploaded to this repository without the file.\
+The server for this app can be found here: https://github.com/YuvalUner/Whatsapp_like_app_web_server
+The Android client for this app can be found here: https://github.com/YuvalUner/Whatsapp_like_app_android_client
 
 # Whatsapp-like web-client
 
