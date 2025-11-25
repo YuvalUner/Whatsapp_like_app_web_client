@@ -7,10 +7,9 @@ The Android client for this app can be found here: https://github.com/YuvalUner/
 
 # Whatsapp-like web-client
 
-### `Submitters`:
-
-Yuval Uner, Github: YuvalUner.\
-Nadav Elgrabli, Github: NadavElgrabli.
+### `Authors`:
+Yuval Uner, Github: [YuvalUner](https://github.com/YuvalUner).\
+Nadav Elgrabli, Github: [NadavElgrabli](https://github.com/NadavElgrabli).
 
 To run the project, use "npm start".\
 The root file is index.js.
@@ -111,34 +110,3 @@ Allows for searching through contacts, and updates the displayed contacts while 
 Using cookies, we implemented automatic log-in of users that already signed-in before using cookies.\
 If the user chose "remember me", they will be remembered for a period of a week, which will be renewed
 upon logging in again.
-
-## Known issues
-
-### `Form related`
-
-1. Going back from verifying email after registration to the log-in screen causes the 
-"Password changed successfully" text to mistakenly appear.\
-As this is a fairly uncommon and unlikely scenario which requires the user to use controls outside of those we designed for navigation
-, we did not try to fix it within our time constraints.
-
-### `Chat related`
-
-On trying to converse with the hard coded contacts (those hard coded in the RegisteredUsers.js file,
-the same ones added on sign-up for demonstration purposes), the following can occur:
-1. They will not display the sent messages on their end.
-2. If trying to converse with them after logging out once, errors will be caused.
-
-These issues are caused by the way the arrays containing the hard coded users are loaded.\
-However, everything done between 2 "real", that is, users actually created via the sign-up process
-works with no issues.\
-Therefore, we chose not to try and fix this as all the hard-coded users will be gone once a server is up.
-
-## Not yet implemented features
-
-1. Sending emails to the user - will be added on the server side.
-2. Adding contacts via their phone number - will be implemented when server side is developed.
-3. Adding contacts via their nickname + discriminator (much like discord) - will be implemented
-once the server side is developed.
-
-2 and 3 were not implemented to avoid adding even more duplicate data into the session storage, when
-in reality it should simply all be done in a database.
